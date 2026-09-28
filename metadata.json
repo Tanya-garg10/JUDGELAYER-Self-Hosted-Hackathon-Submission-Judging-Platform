@@ -1,0 +1,6 @@
+{
+  "name": "JUDGELAYER - Hackathon Judging OS",
+  "description": "The open-source operating system for hackathon submissions, judging, normalization & defensible results.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

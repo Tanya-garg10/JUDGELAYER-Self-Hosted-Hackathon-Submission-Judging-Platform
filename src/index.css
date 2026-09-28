@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-page: #F6F7F9;
+    --surface-card: #FFFFFF;
+    --surface-subtle: #F0F2F5;
+    --border-subtle: #E2E4E9;
+    --border-strong: #CDD0D8;
+    --text-primary: #111318;
+    --text-muted: #6B7280;
+    --accent-violet: #6E44FF;
+    --accent-cyan: #00C9DB;
+    --status-secure: #059669;
+    --status-alert: #DC2626;
+    --status-pending: #D97706;
+  }
+
+  body {
+    background-color: #F6F7F9;
+    color: #111318;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+/* Precision micro-grid pattern for technical command center feel */
+.bg-command-grid {
+  background-image: radial-gradient(rgba(17, 19, 24, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-dot-matrix {
+  background-image: radial-gradient(rgba(110, 68, 255, 0.12) 1.2px, transparent 1.2px);
+  background-size: 16px 16px;
+}
+
+/* Subtle signal pulse */
+@keyframes signalPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.92);
+  }
+}
+
+.animate-signal {
+  animation: signalPulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom crisp scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}

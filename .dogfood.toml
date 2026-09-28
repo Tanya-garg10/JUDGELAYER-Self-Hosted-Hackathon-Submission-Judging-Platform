@@ -1,0 +1,19 @@
+[portal]
+base_url = "http://localhost:3000"
+
+[tiers]
+claimed = ["T1", "T2"]
+pitch = "A self-hosted submission and judging workspace built around secure role isolation, transparent scoring, and defensible hackathon results."
+
+[auth]
+organizer = "Cookie: session=session_organizer_sec_991"
+judge_a = "Cookie: session=session_judge_a_ada_102"
+judge_b = "Cookie: session=session_judge_b_marcus_554"
+participant = "Cookie: session=session_participant_tanya_883"
+
+[routes]
+gallery = "/projects"
+submit = "/projects/new"
+judge_scores = "/api/judge/scores"
+peer_scores = "/api/judge/scores?judge=judge_a"
+csv_export = "/api/export.csv"
