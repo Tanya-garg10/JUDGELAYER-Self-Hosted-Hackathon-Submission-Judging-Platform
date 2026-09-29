@@ -1,9 +1,18 @@
 # JUDGELAYER
 
-> **Run the event. Protect the judging. Trust the results.**  
+> **Run the event. Protect the judging. Trust the results.**
 > The open-source operating system for hackathon submissions, judging, normalization, and defensible results.
 
 Built for the **DOGFOOD 2026** Hackathon challenge. JUDGELAYER is a zero-external-dependency, self-hostable command center that unifies submissions, judge assignment matrices, strict role-based access control, cryptographic-grade audit logging, score normalization, and organizer exports.
+
+---
+
+## 🔗 Links
+
+| | |
+|:---|:---|
+| 🌐 **Live Demo** | [judgelayer-self-hosted-hackathon.onrender.com](https://judgelayer-self-hosted-hackathon.onrender.com/) |
+| 🎬 **Demo Video** | [Watch on Google Drive](https://drive.google.com/file/d/1ThHje2t4vV-GU83m-5o8wF9sB3_hbNaF/view?usp=drive_link) |
 
 ---
 
