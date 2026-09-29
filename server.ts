@@ -57,10 +57,24 @@ function loadFixtures() {
   const dataDir = process.env.DATA_PATH || path.resolve(__dirname, 'data');
   const persistentPath = path.resolve(dataDir, 'judgelayer-data.json');
   
+  function normalise(raw: any): FixturesData {
+    // fixtures.json uses "judges" but the server expects "users"
+    if (raw.judges && !raw.users) raw.users = raw.judges;
+    // ensure every array field exists so .find()/.filter() never crash
+    raw.users        = raw.users        || [];
+    raw.tracks       = raw.tracks       || [];
+    raw.teams        = raw.teams        || [];
+    raw.projects     = raw.projects     || [];
+    raw.assignments  = raw.assignments  || [];
+    raw.scores       = raw.scores       || [];
+    raw.audit_logs   = raw.audit_logs   || [];
+    return raw as FixturesData;
+  }
+
   if (fs.existsSync(persistentPath)) {
     try {
       const raw = fs.readFileSync(persistentPath, 'utf-8');
-      db = JSON.parse(raw);
+      db = normalise(JSON.parse(raw));
       console.log(`[JUDGELAYER] Loaded persistent data: ${db.projects.length} projects, ${db.scores.length} scores.`);
       return;
     } catch (err) {
@@ -72,7 +86,7 @@ function loadFixtures() {
   if (fs.existsSync(fixturePath)) {
     try {
       const raw = fs.readFileSync(fixturePath, 'utf-8');
-      db = JSON.parse(raw);
+      db = normalise(JSON.parse(raw));
       console.log(`[JUDGELAYER] Loaded fixtures successfully: ${db.projects.length} projects, ${db.scores.length} scores.`);
       savePersistentData(); // Save initial data to persistent storage
     } catch (err) {
