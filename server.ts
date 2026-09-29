@@ -112,9 +112,18 @@ function loadFixtures() {
       },
     ];
 
+    // Remove any non-seed entries that accidentally carry a seed token (corrupt state)
+    const seedTokens = new Set(SEED_USERS.map(s => s.token));
+    const seedIds    = new Set(SEED_USERS.map(s => s.id));
+    raw.users = raw.users.filter((u: any) => !seedTokens.has(u.token) || seedIds.has(u.id));
+
+    // Always upsert seed users — replace any stale/corrupt entry by ID
     for (const seed of SEED_USERS) {
-      if (!raw.users.find((u: any) => u.id === seed.id)) {
+      const idx = raw.users.findIndex((u: any) => u.id === seed.id);
+      if (idx === -1) {
         raw.users.push(seed);
+      } else {
+        raw.users[idx] = seed; // overwrite stale persistent entry
       }
     }
 
