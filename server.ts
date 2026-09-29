@@ -58,16 +58,66 @@ function loadFixtures() {
   const persistentPath = path.resolve(dataDir, 'judgelayer-data.json');
   
   function normalise(raw: any): FixturesData {
-    // fixtures.json uses "judges" but the server expects "users"
-    if (raw.judges && !raw.users) raw.users = raw.judges;
     // ensure every array field exists so .find()/.filter() never crash
-    raw.users        = raw.users        || [];
     raw.tracks       = raw.tracks       || [];
     raw.teams        = raw.teams        || [];
     raw.projects     = raw.projects     || [];
     raw.assignments  = raw.assignments  || [];
     raw.scores       = raw.scores       || [];
     raw.audit_logs   = raw.audit_logs   || [];
+
+    // fixtures.json uses "judges" (no role/token) — map them to proper user objects
+    const judgeSource: any[] = raw.users || raw.judges || [];
+    raw.users = judgeSource.map((j: any, idx: number) => ({
+      id:       j.id       || `user_judge_${idx + 1}`,
+      judge_id: j.judge_id || j.id,
+      name:     j.name,
+      email:    j.email,
+      role:     j.role     || 'judge',
+      token:    j.token    || `session_judge_${j.id || idx + 1}`,
+      avatar:   j.avatar   || j.name.split(' ').map((p: string) => p[0]).join('').slice(0, 2).toUpperCase(),
+      title:    j.title    || `Judge`,
+      tracks:   j.tracks   || [],
+      team_id:  j.team_id  || undefined,
+    }));
+
+    // Always ensure the organizer and built-in judge/participant personas exist
+    const SEED_USERS = [
+      {
+        id: 'user_organizer', judge_id: undefined,
+        name: 'Elena Rostova', email: 'elena@judgelayer.org',
+        role: 'organizer', token: 'session_organizer_sec_991',
+        avatar: 'ER', title: 'Lead Hackathon Director',
+      },
+      {
+        id: 'user_judge_a', judge_id: 'judge_a',
+        name: 'Ada Okonkwo', email: 'ada@mit.edu',
+        role: 'judge', token: 'session_judge_a_ada_102',
+        avatar: 'AO', title: 'Principal Systems Architect @ MIT Distributed Lab',
+        tracks: [],
+      },
+      {
+        id: 'user_judge_b', judge_id: 'judge_b',
+        name: 'Marcus Chen', email: 'marcus@infra.dev',
+        role: 'judge', token: 'session_judge_b_marcus_554',
+        avatar: 'MC', title: 'Staff Platform Engineer @ InfraDev',
+        tracks: [],
+      },
+      {
+        id: 'user_participant', judge_id: undefined,
+        name: 'Tanya Garg', email: 'tanyagarg5315@gmail.com',
+        role: 'participant', token: 'session_participant_tanya_883',
+        avatar: 'TG', title: 'Team Lead @ Nightshift',
+        team_id: 'team_nightshift',
+      },
+    ];
+
+    for (const seed of SEED_USERS) {
+      if (!raw.users.find((u: any) => u.id === seed.id)) {
+        raw.users.push(seed);
+      }
+    }
+
     return raw as FixturesData;
   }
 
