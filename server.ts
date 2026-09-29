@@ -104,6 +104,13 @@ function loadFixtures() {
         tracks: [],
       },
       {
+        id: 'user_judge_c', judge_id: 'judge_c',
+        name: 'Dr. Aris Thorne', email: 'aris.thorne@consensus.ai',
+        role: 'judge', token: 'session_judge_c_aris_773',
+        avatar: 'AT', title: 'Consensus Lead @ Bias Simulation Lab',
+        tracks: [],
+      },
+      {
         id: 'user_participant', judge_id: undefined,
         name: 'Tanya Garg', email: 'tanyagarg5315@gmail.com',
         role: 'participant', token: 'session_participant_tanya_883',
@@ -130,15 +137,12 @@ function loadFixtures() {
     return raw as FixturesData;
   }
 
+  // Delete stale persistent data so normalise() always runs fresh from fixtures
   if (fs.existsSync(persistentPath)) {
     try {
-      const raw = fs.readFileSync(persistentPath, 'utf-8');
-      db = normalise(JSON.parse(raw));
-      console.log(`[JUDGELAYER] Loaded persistent data: ${db.projects.length} projects, ${db.scores.length} scores.`);
-      return;
-    } catch (err) {
-      console.error('[JUDGELAYER] Error reading persistent data, falling back to fixtures:', err);
-    }
+      fs.unlinkSync(persistentPath);
+      console.log('[JUDGELAYER] Cleared stale persistent data — will rebuild from fixtures.json.');
+    } catch (_) {}
   }
   
   // Fall back to fixtures.json
