@@ -42,6 +42,31 @@ npm run build
 npm start
 ```
 
+## 🌐 Cloud Deployment
+
+### Render (Recommended - Free Tier)
+1. Connect your GitHub repository to [Render.com](https://render.com)
+2. Create a new "Web Service"
+3. Select "Node.js" runtime
+4. Render will automatically detect the configuration from `render.yaml`
+5. Deploy! The app will be live at `https://your-app.onrender.com`
+
+### Vercel (Frontend + Separate Backend)
+For Vercel deployment, you'll need to:
+1. Deploy frontend to Vercel
+2. Deploy backend separately (Render/Railway)
+3. Configure CORS between frontend and backend
+
+### Manual Cloud Deployment
+```bash
+# On any VPS or cloud server
+git clone https://github.com/Tanya-garg10/JUDGELAYER-Self-Hosted-Hackathon-Submission-Judging-Platform.git
+cd JUDGELAYER-Self-Hosted-Hackathon-Submission-Judging-Platform
+npm install
+npm run build
+npm start
+```
+
 ---
 
 ## 🔑 Pre-Seeded Auth Credentials

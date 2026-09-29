@@ -53,16 +53,46 @@ let db: FixturesData = {
 
 function loadFixtures() {
   const fixturePath = path.resolve(__dirname, 'fixtures.json');
+  // Try to load from persistent storage first (for cloud deployment)
+  const dataDir = process.env.DATA_PATH || path.resolve(__dirname, 'data');
+  const persistentPath = path.resolve(dataDir, 'judgelayer-data.json');
+  
+  if (fs.existsSync(persistentPath)) {
+    try {
+      const raw = fs.readFileSync(persistentPath, 'utf-8');
+      db = JSON.parse(raw);
+      console.log(`[JUDGELAYER] Loaded persistent data: ${db.projects.length} projects, ${db.scores.length} scores.`);
+      return;
+    } catch (err) {
+      console.error('[JUDGELAYER] Error reading persistent data, falling back to fixtures:', err);
+    }
+  }
+  
+  // Fall back to fixtures.json
   if (fs.existsSync(fixturePath)) {
     try {
       const raw = fs.readFileSync(fixturePath, 'utf-8');
       db = JSON.parse(raw);
       console.log(`[JUDGELAYER] Loaded fixtures successfully: ${db.projects.length} projects, ${db.scores.length} scores.`);
+      savePersistentData(); // Save initial data to persistent storage
     } catch (err) {
       console.error('[JUDGELAYER] Error reading fixtures.json:', err);
     }
   } else {
     console.warn('[JUDGELAYER] fixtures.json not found at:', fixturePath);
+  }
+}
+
+function savePersistentData() {
+  const dataDir = process.env.DATA_PATH || path.resolve(__dirname, 'data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+  const persistentPath = path.resolve(dataDir, 'judgelayer-data.json');
+  try {
+    fs.writeFileSync(persistentPath, JSON.stringify(db, null, 2));
+  } catch (err) {
+    console.error('[JUDGELAYER] Error saving persistent data:', err);
   }
 }
 
@@ -87,6 +117,7 @@ function addAuditLog(entry: {
   if (db.audit_logs.length > 200) {
     db.audit_logs.pop();
   }
+  savePersistentData();
   return logEntry;
 }
 
@@ -385,6 +416,7 @@ app.patch('/api/event', requireRole(['organizer']), (req, res) => {
   if (status !== undefined) db.event.status = status;
   if (results_published !== undefined) db.event.results_published = results_published;
   if (review_target_per_project !== undefined) db.event.review_target_per_project = review_target_per_project;
+  savePersistentData();
 
   addAuditLog({
     actor_id: req.user!.id,
@@ -514,6 +546,7 @@ app.post('/api/projects', requireRole(['participant', 'organizer']), (req, res) 
   };
 
   db.projects.push(newProject);
+  savePersistentData();
 
   addAuditLog({
     actor_id: req.user!.id,
@@ -568,6 +601,7 @@ app.patch('/api/projects/:id', requireRole(['participant', 'organizer']), (req, 
   if (repo_url) proj.repo_url = repo_url;
   if (demo_url) proj.demo_url = demo_url;
   if (track_id) proj.track_id = track_id;
+  savePersistentData();
 
   addAuditLog({
     actor_id: req.user!.id,
@@ -735,6 +769,7 @@ app.post('/api/judge/scores', requireRole(['judge', 'organizer']), (req, res) =>
     };
     db.scores.push(existing);
   }
+  savePersistentData();
 
   const proj = db.projects.find(p => p.id === project_id);
   addAuditLog({
@@ -862,6 +897,7 @@ app.post('/api/organizer/assignments', requireRole(['organizer']), (req, res) =>
   const index = db.assignments.findIndex(a => a.judge_id === judge_id && a.project_id === project_id);
   if (assigned && index === -1) {
     db.assignments.push({ judge_id, project_id });
+    savePersistentData();
     addAuditLog({
       actor_id: req.user!.id,
       actor_name: `${req.user!.name} (Organizer)`,
@@ -873,6 +909,7 @@ app.post('/api/organizer/assignments', requireRole(['organizer']), (req, res) =>
     });
   } else if (!assigned && index !== -1) {
     db.assignments.splice(index, 1);
+    savePersistentData();
     addAuditLog({
       actor_id: req.user!.id,
       actor_name: `${req.user!.name} (Organizer)`,
@@ -933,6 +970,7 @@ app.get('/api/results', (req, res) => {
 app.post('/api/organizer/publish', requireRole(['organizer']), (req, res) => {
   const { published } = req.body;
   db.event.results_published = Boolean(published);
+  savePersistentData();
 
   addAuditLog({
     actor_id: req.user!.id,

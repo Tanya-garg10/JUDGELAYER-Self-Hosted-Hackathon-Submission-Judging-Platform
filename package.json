@@ -11,6 +11,9 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "openai": "^4.104.0",
     "@tailwindcss/vite": "^4.3.3",
